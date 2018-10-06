@@ -12,12 +12,17 @@ class Bot:
             :param playerInfo: Your bot's current state.
         """
         self.PlayerInfo = playerInfo
-        if StorageHelper.read("isInit") is None:
+        test = [Point(0, 1), Point(0, 1), Point(0, 1), Point(0, 1)]
+
+        if StorageHelper.read("isInit") == None:
+            print("initialized")
             StorageHelper.write("isInit", True)
-            StorageHelper.write("bptr", [(0, 1), (0, 1), (0, 1), (0, 1)])
+            StorageHelper.write("bptr", json.dumps(test))
             StorageHelper.write("posInPath", 0)
 
-        for tuple in StorageHelper.read("bptr"):
+        print(StorageHelper.read("isInit"))
+        print(StorageHelper.read("bptr"))
+        for tuple in json.loads(StorageHelper.read("bptr")):
             self.path.append(Point(tuple[0], tuple[1]))
 
         self.index = StorageHelper.read("posInPath")
