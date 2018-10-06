@@ -1,6 +1,5 @@
 from helper import *
 
-
 class Bot:
     def __init__(self):
         pass
@@ -33,7 +32,6 @@ class Bot:
         """
         pass
 
-
 	def find_closest_resource(self, gameMap):
 		# Find closest resource
 		for x in range (0,20):
@@ -48,4 +46,8 @@ class Bot:
 			for y in range (0,20):
 				if (gameMap.getTileAt(x,y) == House)
 					return = (x,y)
+	def map_to_graph(gameMap):
+		vertices = []
+		edges = [()]
+
 		
