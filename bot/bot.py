@@ -63,21 +63,14 @@ class Bot:
         if self.PlayerInfo.CarriedResources < self.PlayerInfo.CarryingCapacity:
             closestResource = self.find_closest(gameMap, self.PlayerInfo.Position, TileContent.Resource)
             closestPlayer = self.find_closest(gameMap, self.PlayerInfo.Position, TileContent.Player)
-            closestHouse = self.find_closest(gameMap, self.PlayerInfo.Position, TileContent.House)
- 
+            closestHouse = self.find_closest(gameMap, self.PlayerInfo.Position, TileContent.House) 
 
-            if closestResource == None and closestPlayer == None:
-                 return self.randomMove()
-            elif closestResource == None and closestPlayer != None:
-                dest = closestPlayer
-            elif closestResource != None and closestPlayer == None:
-                dest = closestResource
-            elif Point.Distance(closestResource, self.PlayerInfo.Position) < Point.Distance(closestPlayer, self.PlayerInfo.Position):
-                print("Gathering")
-                dest = closestResource
+            pointsOfInterest = list(filter(lambda p : p != None, [closestResource, closestPlayer, closestHouse]))
+            if not pointsOfInterest:
+                return self.randomMove()
             else:
-                print("Attacking")
-                dest = closestPlayer
+                distances = list(map(lambda p : Point.Distance(p, self.PlayerInfo.Position), pointsOfInterest))
+                dest = pointsOfInterest[distances.index(min(distances))]    
         else:
             dropoff = True
             dest = self.PlayerInfo.HouseLocation
