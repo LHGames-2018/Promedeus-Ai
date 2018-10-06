@@ -56,8 +56,8 @@ class Bot:
             dest = self.find_closest(gameMap, self.PlayerInfo.Position, TileContent.Resource)
         else:
             dropoff = True
-            dest = self.find_closest(gameMap, self.PlayerInfo.Position, TileContent.House)
-
+            dest = self.PlayerInfo.HouseLocation
+ 
         print(self.PlayerInfo.Position)
         print(dest)
         print(self.PlayerInfo.CarriedResources)
