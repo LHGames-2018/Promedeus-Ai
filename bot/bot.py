@@ -5,7 +5,8 @@ from random import randint
 
 class Bot: 
     def __init__(self):
-        pass
+        self.path = []
+        self.index = 0
 
     def before_turn(self, playerInfo):
         """
@@ -13,6 +14,20 @@ class Bot:
 		    :param playerInfo: Your bot's current state.
         """
         self.PlayerInfo = playerInfo
+        test = [Point(0, 1), Point(0, 1), Point(0, 1), Point(0, 1)]
+
+        if StorageHelper.read("isInit") == None:
+            print("initialized")
+            StorageHelper.write("isInit", True)
+            StorageHelper.write("bptr", json.dumps(test))
+            StorageHelper.write("posInPath", 0)
+
+        print(StorageHelper.read("isInit"))
+        print(StorageHelper.read("bptr"))
+        for tuple in json.loads(StorageHelper.read("bptr")):
+            self.path.append(Point(tuple[0], tuple[1]))
+
+        self.index = StorageHelper.read("posInPath")
 
     def execute_turn(self, gameMap, visiblePlayers):
         """
@@ -20,6 +35,11 @@ class Bot:
 			:param gameMap: The gamemap.
 			:param visiblePlayers:  The list of visible players.
         """
+
+        if StorageHelper.read("posInPath") < len(self.path):
+            StorageHelper.write("posInPath", StorageHelper.read("posInPath") + 1)
+            return create_move_action(self.path[self.index])
+
 
         # Write your bot here. Use functions from aiHelper to instantiate your actions.
         dropoff = False
@@ -130,3 +150,13 @@ class Bot:
         (x2, y2) = b
         return abs(x1 - x2) + abs(y1 - y2)
 
+    def get_ressource(self, gameMap):
+        # Collect resources
+        if gameMap.getTileAt(1, 0) == TileContent.Resource:
+            return create_collect_action(Point(1, 0))
+        elif gameMap.getTileAt(0, 1) == TileContent.Resource:
+            return create_collect_action(Point(0, 1))
+        elif gameMap.getTileAt(0, -1) == TileContent.Resource:
+            return create_collect_action(Point(0, -1))
+        elif gameMap.getTileAt(-1, 0) == TileContent.Resource:
+            return create_collect_action(Point(-1, 0))

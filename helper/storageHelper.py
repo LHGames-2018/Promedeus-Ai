@@ -15,6 +15,8 @@ class StorageHelper:
     @staticmethod
     def read(key):
         StorageHelper.__init()
+        if key not in StorageHelper.__document:
+            return None
         data = StorageHelper.__document[key]
         if data is None:
             return None

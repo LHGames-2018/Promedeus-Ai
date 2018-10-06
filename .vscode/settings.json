@@ -1,0 +1,6 @@
+{
+    "python.jediEnabled": false,
+    "python.pythonPath": "C:\\Users\\mbela\\AppData\\Local\\conda\\conda\\envs\\lhGames\\python.exe",
+    "python.linting.enabled": true,
+    "python.linting.pylintEnabled": true
+}
