@@ -53,10 +53,10 @@ class Bot:
         if self.PlayerInfo.Position == self.PlayerInfo.HouseLocation:
             currentLevel = 0
             for upgrade in upgradePriority:
-                if currentLevel > self.PlayerInfo.getUpgradeLevels[upgrade]:
-                    if self.PlayerInfo.TotalResources >= upgradePrices[self.PlayerInfo.getUpgradeLevels[upgrade] + 1]:
+                if currentLevel > self.PlayerInfo.getUpgradeLevel(upgrade):
+                    if self.PlayerInfo.TotalResources >= upgradePrices[self.PlayerInfo.getUpgradeLevel(upgrade) + 1]:
                         return create_upgrade_action(upgrade)
-                currentLevel = self.PlayerInfo.getUpgradeLevels[upgrade] 
+                currentLevel = self.PlayerInfo.getUpgradeLevel(upgrade) 
 
         dropoff = False
 
@@ -127,7 +127,11 @@ class Bot:
         for x in range (start.x - 10, start.x + 10):
             for y in range (start.y - 10, start.y + 10):
                 if gameMap.getTileAt(Point(x,y)) == tileType:
-                    if tileType == TileContent.Player and (start.x, start.y) == (x,y):
+                    # Ignore ourself when looking for player to kill
+                    if tileType == TileContent.Player and start == Point(x,y):
+                        continue
+                    # Ignore our house when looking for house to steal
+                    elif tileType == TileContent.House and self.PlayerInfo.HouseLocation == Point(x,y):
                         continue
                     else:
                         points.append(Point(x,y))
@@ -141,19 +145,6 @@ class Bot:
                 closest = p
 
         return closest
-
-    def find_resource(self, gameMap):
-        for x in range (0,20):
-            for y in range (0,20):
-                if gameMap.getTileAt(Point(x,y)) == TileContent.Resource:
-                    return (x,y)
-        
-        return (10,10)
-
-    def map_to_graph(gameMap):
-        vertices = []
-        edges = [()]
-
 
     def generate_path(self, gameMap, dest):
         # Using A*
@@ -193,14 +184,3 @@ class Bot:
         (x1, y1) = a
         (x2, y2) = b
         return abs(x1 - x2) + abs(y1 - y2)
-
-    def get_ressource(self, gameMap):
-        # Collect resources
-        if gameMap.getTileAt(1, 0) == TileContent.Resource:
-            return create_collect_action(Point(1, 0))
-        elif gameMap.getTileAt(0, 1) == TileContent.Resource:
-            return create_collect_action(Point(0, 1))
-        elif gameMap.getTileAt(0, -1) == TileContent.Resource:
-            return create_collect_action(Point(0, -1))
-        elif gameMap.getTileAt(-1, 0) == TileContent.Resource:
-            return create_collect_action(Point(-1, 0))
