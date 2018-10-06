@@ -43,13 +43,19 @@ class Bot:
         """
         pass
 
+    def find_closest_resource(self, gameMap):
+        # Find closest resource
+        for x in range (0, 20):
+            for y in range (0, 20):
+                if gameMap.getTileAt(x, y) == TileContent.Resource:
+                    return (x, y)
 
-	def find_closest_resource(self, gameMap):
-		# Find closest resource
-		for x in range (0,20):
-			for y in range (0,20):
-				if (gameMap.getTileAt(x,y) == Resource)
-					return = (x,y)
+    def find_home(self, gameMap):
+        # Find closest resource
+        for x in range (0, 20):
+            for y in range (0, 20):
+                if gameMap.getTileAt(x, y) == TileContent.House:
+                    return (x, y)
 
 
 	def find_home(self, gameMap):
