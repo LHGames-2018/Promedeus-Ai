@@ -53,17 +53,19 @@ class Bot:
         if self.PlayerInfo.Position == self.PlayerInfo.HouseLocation:
             currentLevel = 0
             for upgrade in upgradePriority:
-                if currentLevel > self.PlayerInfo.getUpgradeLevels[upgrade]:
-                    if self.PlayerInfo.TotalResources >= upgradePrices[self.PlayerInfo.getUpgradeLevels[upgrade]]
+                if currentLevel > self.PlayerInfo.getUpgradeLevel(upgrade):
+                    if self.PlayerInfo.TotalResources >= upgradePrices[self.PlayerInfo.getUpgradeLevel(upgrade) + 1]:
                         return create_upgrade_action(upgrade)
-                currentLevel = self.PlayerInfo.getUpgradeLevels[upgrade] 
+                currentLevel = self.PlayerInfo.getUpgradeLevel(upgrade) 
 
         dropoff = False
 
         if self.PlayerInfo.CarriedResources < self.PlayerInfo.CarryingCapacity:
             closestResource = self.find_closest(gameMap, self.PlayerInfo.Position, TileContent.Resource)
             closestPlayer = self.find_closest(gameMap, self.PlayerInfo.Position, TileContent.Player)
-           
+            closestHouse = self.find_closest(gameMap, self.PlayerInfo.Position, TileContent.House)
+ 
+
             if closestResource == None and closestPlayer == None:
                  return self.randomMove()
             elif closestResource == None and closestPlayer != None:
@@ -83,6 +85,7 @@ class Bot:
         print(self.PlayerInfo.Position)
         print(dest)
         print(self.PlayerInfo.CarriedResources)
+        print(self.PlayerInfo.TotalResources)
  
         if Point.Distance(dest, self.PlayerInfo.Position) == 1 and not dropoff:
             return create_collect_action(dest - self.PlayerInfo.Position)
@@ -124,7 +127,11 @@ class Bot:
         for x in range (start.x - 10, start.x + 10):
             for y in range (start.y - 10, start.y + 10):
                 if gameMap.getTileAt(Point(x,y)) == tileType:
-                    if tileType == TileContent.Player and (start.x, start.y) == (x,y):
+                    # Ignore ourself when looking for player to kill
+                    if tileType == TileContent.Player and start == Point(x,y):
+                        continue
+                    # Ignore our house when looking for house to steal
+                    elif tileType == TileContent.House and self.PlayerInfo.HouseLocation == Point(x,y):
                         continue
                     else:
                         points.append(Point(x,y))
@@ -139,20 +146,10 @@ class Bot:
 
         return closest
 
-    def find_resource(self, gameMap):
-        for x in range (0,20):
-            for y in range (0,20):
-                if gameMap.getTileAt(Point(x,y)) == TileContent.Resource:
-                    return (x,y)
-        
-        return (10,10)
-
-    def map_to_graph(gameMap):
-        vertices = []
-        edges = [()]
 
 
-     def generate_path(self, gameMap, dest):
+    def generate_path(self, gameMap, dest):
+        # Using A*
 
         current_pos = self.PlayerInfo.Position
         path = queue.Queue
@@ -199,13 +196,4 @@ class Bot:
 
 
 
-    def get_ressource(self, gameMap):
-        # Collect resources
-        if gameMap.getTileAt(1, 0) == TileContent.Resource:
-            return create_collect_action(Point(1, 0))
-        elif gameMap.getTileAt(0, 1) == TileContent.Resource:
-            return create_collect_action(Point(0, 1))
-        elif gameMap.getTileAt(0, -1) == TileContent.Resource:
-            return create_collect_action(Point(0, -1))
-        elif gameMap.getTileAt(-1, 0) == TileContent.Resource:
-            return create_collect_action(Point(-1, 0))
+
