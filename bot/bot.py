@@ -84,6 +84,7 @@ class Bot:
             print("Collecting")
             return create_collect_action(dest - self.PlayerInfo.Position)
 
+        """
         data = StorageHelper.read("path")
         if data == None:
             path = self.generate_path(gameMap, dest)
@@ -101,7 +102,7 @@ class Bot:
             return self.move(gameMap, Point(0,-1))
         elif dest.y - self.PlayerInfo.Position.y > 0:
             return self.move(gameMap, Point(0,1))
-        """
+       
 
         
 
