@@ -54,7 +54,7 @@ class Bot:
             currentLevel = 0
             for upgrade in upgradePriority:
                 if currentLevel > self.PlayerInfo.getUpgradeLevels[upgrade]:
-                    if self.PlayerInfo.TotalResources >= upgradePrices[self.PlayerInfo.getUpgradeLevels[upgrade]]
+                    if self.PlayerInfo.TotalResources >= upgradePrices[self.PlayerInfo.getUpgradeLevels[upgrade] + 1]:
                         return create_upgrade_action(upgrade)
                 currentLevel = self.PlayerInfo.getUpgradeLevels[upgrade] 
 
@@ -63,7 +63,9 @@ class Bot:
         if self.PlayerInfo.CarriedResources < self.PlayerInfo.CarryingCapacity:
             closestResource = self.find_closest(gameMap, self.PlayerInfo.Position, TileContent.Resource)
             closestPlayer = self.find_closest(gameMap, self.PlayerInfo.Position, TileContent.Player)
-           
+            closestHouse = self.find_closest(gameMap, self.PlayerInfo.Position, TileContent.House)
+ 
+
             if closestResource == None and closestPlayer == None:
                  return self.randomMove()
             elif closestResource == None and closestPlayer != None:
@@ -83,6 +85,7 @@ class Bot:
         print(self.PlayerInfo.Position)
         print(dest)
         print(self.PlayerInfo.CarriedResources)
+        print(self.PlayerInfo.TotalResources)
  
         if Point.Distance(dest, self.PlayerInfo.Position) == 1 and not dropoff:
             return create_collect_action(dest - self.PlayerInfo.Position)
