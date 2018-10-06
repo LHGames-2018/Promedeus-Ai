@@ -81,8 +81,18 @@ class Bot:
         print(self.PlayerInfo.TotalResources)
  
         if Point.Distance(dest, self.PlayerInfo.Position) == 1 and not dropoff:
+            print("Collecting")
             return create_collect_action(dest - self.PlayerInfo.Position)
- 
+
+        data = StorageHelper.read("path")
+        if data == None:
+            path = self.generate_path(gameMap, dest)
+            return self.move_along(gameMap, path)
+        else:
+            return self.move_along(gameMap, self.get_queue_from_path_data(data))
+        
+
+        """	
         if dest.x - self.PlayerInfo.Position.x < 0:
             return self.move(gameMap, Point(-1,0))
         elif dest.x - self.PlayerInfo.Position.x > 0:
@@ -91,6 +101,9 @@ class Bot:
             return self.move(gameMap, Point(0,-1))
         elif dest.y - self.PlayerInfo.Position.y > 0:
             return self.move(gameMap, Point(0,1))
+        """
+
+        
 
     def move(self, gameMap, direction):
         if gameMap.getTileAt(self.PlayerInfo.Position + direction) == TileContent.Wall:
@@ -144,49 +157,47 @@ class Bot:
     def generate_path(self, gameMap, dest):
         # Using A*
 
+        print("Generating path")
+
         current_pos = self.PlayerInfo.Position
-        path = queue.Queue
+        path = queue.Queue()
         path.put(current_pos)
 
-        while(!(current_pos.eq(dest))):
-
+        while(not (current_pos == dest)):
+            p = Point(0,0)
             if dest.x - current_pos.x < 0:
-                path.append(Point(current_pos.x-1,current_pos.y))
-
+                p = Point(-1, 0) 
             elif dest.x - current_pos.x > 0:
-                path.append(Point(current_pos.x+1,current_pos.y))
-
+                p = Point(1, 0) 
             elif dest.y - current_pos.y < 0:
-                path.append(Point(current_pos.x,current_pos.y-1))
-
+                p = Point(0, -1) 
             elif dest.y - current_pos.y > 0:
-                path.append(Point(current_pos.x,current_pos.y+1))
+                p = Point(0, 1) 
 
-
-
-        StorageHelper.write("path", serialize_path_queue_for_data(path))
+            path.put(p)
+            current_pos += p
 
         return path
 
-    def serialize_path_queue_for_data(queue):
+    def serialize_path_queue_for_data(self, path):
         tuple_path = []
-        for point in path:
+        while not path.empty():
+            point = path.get()
             tuple_path.append((point.x, point.y))
 
         return tuple_path
 
-    def get_queue_from_path_data(data):
-        path_queue = queue.Queue
+    def get_queue_from_path_data(self, data):
+        path = queue.Queue()
         for tuple in data:
             path.put(Point(tuple[0], tuple[1]))
         
         return path
 
-    def move_along(self,gameMap):
-        data = StorageHelper.read("path")
-        path = remaining_path.get_queue_from_path_data(data)
+    def move_along(self, gameMap, path):
+        print(path)
         next_move = path.get()
+        StorageHelper.write("path", self.serialize_path_queue_for_data(path))
 
-
-
+        return self.move(gameMap, next_move)
 
