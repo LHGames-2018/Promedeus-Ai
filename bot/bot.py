@@ -46,14 +46,28 @@ class Bot:
             return create_move_action(self.path[self.index])
         """
 
-        if StorageHelper.read("house") == None:
-            house = self.find_closest(gameMap, self.PlayerInfo.Position, TileContent.House)   
-            StorageHelper.write("house", (house.x, house.y))
+        if self.PlayerInfo.Position == self.PlayerInfo.HouseLocation:
+            if self.PlayerInfo.TotalResources >= 10000:
+                return create_upgrade_action(UpgradeType.CollectingSpeed)
 
-        # Write your bot here. Use functions from aiHelper to instantiate your actions.
         dropoff = False
+
         if self.PlayerInfo.CarriedResources < self.PlayerInfo.CarryingCapacity:
-            dest = self.find_closest(gameMap, self.PlayerInfo.Position, TileContent.Resource)
+            closestResource = self.find_closest(gameMap, self.PlayerInfo.Position, TileContent.Resource)
+            closestPlayer = self.find_closest(gameMap, self.PlayerInfo.Position, TileContent.Player)
+           
+            if closestResource == None and closestPlayer == None:
+                 return self.randomMove()
+            elif closestResource == None and closestPlayer != None:
+                dest = closestPlayer
+            elif closestResource != None and closestPlayer == None:
+                dest = closestResource
+            elif Point.Distance(closestResource, self.PlayerInfo.Position) < Point.Distance(closestPlayer, self.PlayerInfo.Position):
+                print("Gathering")
+                dest = closestResource
+            else:
+                print("Attacking")
+                dest = closestPlayer
         else:
             dropoff = True
             dest = self.PlayerInfo.HouseLocation
@@ -62,16 +76,6 @@ class Bot:
         print(dest)
         print(self.PlayerInfo.CarriedResources)
 
-        if dest == None:
-            r = randint(0,3)
-            if r == 0:
-                return create_move_action(Point(1, 0))
-            elif r == 1:
-                return create_move_action(Point(-1, 0))
-            elif r == 2:
-                return create_move_action(Point(0, 1))
-            elif r == 3:
-                return create_move_action(Point(0, -1))
  
         if Point.Distance(dest, self.PlayerInfo.Position) == 1 and not dropoff:
             return create_collect_action(dest - self.PlayerInfo.Position)
@@ -91,6 +95,17 @@ class Bot:
         else:
             return create_move_action(direction)
     
+    def random_move(self):
+        r = randint(0,3)
+        if r == 0:
+            return create_move_action(Point(1, 0))
+        elif r == 1:
+            return create_move_action(Point(-1, 0))
+        elif r == 2:
+            return create_move_action(Point(0, 1))
+        elif r == 3:
+            return create_move_action(Point(0, -1))
+
     def after_turn(self):
         """
         Gets called after executeTurn
@@ -102,7 +117,10 @@ class Bot:
         for x in range (start.x - 10, start.x + 10):
             for y in range (start.y - 10, start.y + 10):
                 if gameMap.getTileAt(Point(x,y)) == tileType:
-                    points.append(Point(x,y))
+                    if tileType == TileContent.Player and (start.x, start.y) == (x,y):
+                        continue
+                    else:
+                        points.append(Point(x,y))
 
         if not points:
             return None
