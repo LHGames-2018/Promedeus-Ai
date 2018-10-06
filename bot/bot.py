@@ -75,7 +75,10 @@ class Bot:
 
             # Remove after
             if closestShop != None:
-                dest = closestShop
+                if self.PlayerInfo.Position == closestShop:
+                    return create_purchase_action(PurchasableItem.Sword)
+                else:
+                    dest = closestShop
             else:
                 return self.move(gameMap, Point(0,1))
 
