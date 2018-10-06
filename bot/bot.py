@@ -46,6 +46,10 @@ class Bot:
             return create_move_action(self.path[self.index])
         """
 
+        if StorageHelper.read("house") == None:
+            house = self.find_closest(gameMap, self.PlayerInfo.Position, TileContent.House)   
+            StorageHelper.write("house", (house.x, house.y))
+
         # Write your bot here. Use functions from aiHelper to instantiate your actions.
         dropoff = False
         if self.PlayerInfo.CarriedResources < self.PlayerInfo.CarryingCapacity:
@@ -56,6 +60,7 @@ class Bot:
 
         print(self.PlayerInfo.Position)
         print(dest)
+        print(self.PlayerInfo.CarriedResources)
 
         if dest == None:
             r = randint(0,3)
@@ -67,19 +72,25 @@ class Bot:
                 return create_move_action(Point(0, 1))
             elif r == 3:
                 return create_move_action(Point(0, -1))
-         
+ 
         if Point.Distance(dest, self.PlayerInfo.Position) == 1 and not dropoff:
             return create_collect_action(dest - self.PlayerInfo.Position)
  
         if dest.x - self.PlayerInfo.Position.x < 0:
-            return create_move_action(Point(-1, 0))
+            return self.move(gameMap, Point(-1,0))
         elif dest.x - self.PlayerInfo.Position.x > 0:
-            return create_move_action(Point(1, 0))
+            return self.move(gameMap, Point(1,0))
         elif dest.y - self.PlayerInfo.Position.y < 0:
-            return create_move_action(Point(0, -1))
+            return self.move(gameMap, Point(0,-1))
         elif dest.y - self.PlayerInfo.Position.y > 0:
-            return create_move_action(Point(0, 1))
+            return self.move(gameMap, Point(0,1))
 
+    def move(self, gameMap, direction):
+        if gameMap.getTileAt(self.PlayerInfo.Position + direction) == TileContent.Wall:
+            return create_attack_action(direction)
+        else:
+            return create_move_action(direction)
+    
     def after_turn(self):
         """
         Gets called after executeTurn
