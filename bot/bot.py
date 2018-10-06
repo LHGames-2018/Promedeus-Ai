@@ -46,9 +46,17 @@ class Bot:
             return create_move_action(self.path[self.index])
         """
 
+        upgradePriority = [UpgradeType.CollectingSpeed, UpgradeType.CarryingCapacity, UpgradeType.AttackPower]
+        upgradePrices = [10000, 15000, 25000, 50000, 100000]
+        itemPrice = 30000
+
         if self.PlayerInfo.Position == self.PlayerInfo.HouseLocation:
-            if self.PlayerInfo.TotalResources >= 10000:
-                return create_upgrade_action(UpgradeType.CollectingSpeed)
+            currentLevel = 0
+            for upgrade in upgradePriority:
+                if currentLevel > self.PlayerInfo.getUpgradeLevels[upgrade]:
+                    if self.PlayerInfo.TotalResources >= upgradePrices[self.PlayerInfo.getUpgradeLevels[upgrade]]
+                        return create_upgrade_action(upgrade)
+                currentLevel = self.PlayerInfo.getUpgradeLevels[upgrade] 
 
         dropoff = False
 
@@ -75,7 +83,6 @@ class Bot:
         print(self.PlayerInfo.Position)
         print(dest)
         print(self.PlayerInfo.CarriedResources)
-
  
         if Point.Distance(dest, self.PlayerInfo.Position) == 1 and not dropoff:
             return create_collect_action(dest - self.PlayerInfo.Position)
