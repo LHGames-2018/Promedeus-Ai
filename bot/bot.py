@@ -109,6 +109,8 @@ class Bot:
     def move(self, gameMap, direction):
         if gameMap.getTileAt(self.PlayerInfo.Position + direction) == TileContent.Wall:
             return create_attack_action(direction)
+        elif gameMap.getTileAt(self.PlayerInfo.Position + direction) == TileContent.Player:
+            return create_attack_action(direction)
         else:
             return create_move_action(direction)
     
