@@ -59,22 +59,6 @@ class Bot:
                     came_from[n] = current
 
         return came_from
-    
-    def find_closest_resource(self, gameMap):
-        # Find closest resource
-        for x in range (0,20):
-            for y in range (0,20):
-                if gameMap.getTileAt(x,y) == Resource:
-                    return (x,y)
-
-
-    def find_home(self, gameMap):
-        # Find closest resource
-        for x in range (0,20):
-            for y in range (0,20):
-                if gameMap.getTileAt(x,y) == House:
-                    return (x,y)
-
 
     def map_to_graph(gameMap):
         vertices = []
