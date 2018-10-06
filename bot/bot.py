@@ -3,7 +3,8 @@ from helper import *
 
 class Bot:
     def __init__(self):
-        pass
+        self.path = []
+        self.index = 0
 
     def before_turn(self, playerInfo):
         """
@@ -13,8 +14,13 @@ class Bot:
         self.PlayerInfo = playerInfo
         if StorageHelper.read("isInit") is None:
             StorageHelper.write("isInit", True)
-            StorageHelper.write("bptr", [Point(0, 1), Point(0, 1),Point(0, 1), Point(0, 1)])
+            StorageHelper.write("bptr", [(0, 1), (0, 1), (0, 1), (0, 1)])
             StorageHelper.write("posInPath", 0)
+
+        for tuple in StorageHelper.read("bptr"):
+            self.path.append(Point(tuple[0], tuple[1]))
+
+        self.index = StorageHelper.read("posInPath")
 
     def execute_turn(self, gameMap, visiblePlayers):
         """
@@ -23,20 +29,21 @@ class Bot:
             :param visiblePlayers:  The list of visible players.
         """
 
-        if StorageHelper.read("posInPath") < len(StorageHelper.read("bptr")):
+        if StorageHelper.read("posInPath") < len(self.path):
             StorageHelper.write("posInPath", StorageHelper.read("posInPath") + 1)
-            return create_move_action(StorageHelper.read("bptr"))
+            return create_move_action(self.path[self.index])
 
 
         # Write your bot here. Use functions from aiHelper to instantiate your actions.
-        """
-        if(playerInfo.carriedResources < playerInfo.carryingCapacity)
-            dest = find_closest_resource(gameMap)
-        else
-            dest = find_home(gameMap)
+        if self.PlayerInfo.carriedResources < self.PlayerInfo.carryingCapacity:
+            self.get_ressource()
+            #dest = find_closest_resource(gameMap)
+        else:
+            pass
+            #dest = find_home(gameMap)
 
         return create_move_action(Point(1, 0))
-        """
+
 
     def after_turn(self):
         """
@@ -58,7 +65,7 @@ class Bot:
                 if gameMap.getTileAt(x, y) == TileContent.House:
                     return (x, y)
 
-    def get_resource(self, gameMap):
+    def get_ressource(self, gameMap):
         # Collect resources
         if gameMap.getTileAt(1, 0) == TileContent.Resource:
             return create_collect_action(Point(1, 0))
