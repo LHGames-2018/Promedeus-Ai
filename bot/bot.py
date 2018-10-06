@@ -111,6 +111,8 @@ class Bot:
             return create_attack_action(direction)
         elif gameMap.getTileAt(self.PlayerInfo.Position + direction) == TileContent.Player:
             return create_attack_action(direction)
+        elif gameMap.getTileAt(self.PlayerInfo.Position + direction) == TileContent.Resource:
+            return create_move_action(Point(direction.y, direction.x))
         else:
             return create_move_action(direction)
     
