@@ -152,44 +152,52 @@ class Bot:
         edges = [()]
 
 
-    def generate_path(self, gameMap, dest):
-        # Using A*
+     def generate_path(self, gameMap, dest):
 
-        start = (10,10)
-        nodes = []
-        for x in range (0,20):
-            for y in range (0,20):
-                nodes.append((x,y))
+        current_pos = self.PlayerInfo.Position
+        path = queue.Queue
+        path.put(current_pos)
 
-        # Set of nodes already evaluated
-        closedSet = Set()
+        while(!(current_pos.eq(dest))):
 
-        # Set of currently discovered nodes that have not been evaluated
-        openSet = Set([start])
+            if dest.x - current_pos.x < 0:
+                path.append(Point(current_pos.x-1,current_pos.y))
 
-        # List of tuples which contain two nodes (node a, node b 
-        # that can be most efficiently reached from node).
-        # Empty at the beginning.
-        cameFrom = []
+            elif dest.x - current_pos.x > 0:
+                path.append(Point(current_pos.x+1,current_pos.y))
 
-        # For each tile, total cost of getting from the start tile to that node
-        gScore = []
-        gScore.append((start, 0))	# Going from start to start is zero
+            elif dest.y - current_pos.y < 0:
+                path.append(Point(current_pos.x,current_pos.y-1))
 
-        # For each node, the total cost of getting from the start node to the goal
-        # by passing by that node. That value is partly known, partly heuristic.
-        fScore = []
-        for node in nodes:
-            fScore.append(node, math.inf)	
+            elif dest.y - current_pos.y > 0:
+                path.append(Point(current_pos.x,current_pos.y+1))
 
-        for fscore in fScore:
-            if fscore[0] == start:
-                fscore[1] = 0
 
-    def heuristic(a, b):
-        (x1, y1) = a
-        (x2, y2) = b
-        return abs(x1 - x2) + abs(y1 - y2)
+
+        StorageHelper.write("path", serialize_path_queue_for_data(path))
+
+        return path
+
+    def serialize_path_queue_for_data(queue):
+        tuple_path = []
+        for point in path:
+            tuple_path.append((point.x, point.y))
+
+        return tuple_path
+
+    def get_queue_from_path_data(data):
+        path_queue = queue.Queue
+        for tuple in data:
+            path.put(Point(tuple[0], tuple[1]))
+        
+        return path
+
+    def move_along(self,gameMap):
+        data = StorageHelper.read("path")
+        path = remaining_path.get_queue_from_path_data(data)
+        next_move = path.get()
+
+
 
     def get_ressource(self, gameMap):
         # Collect resources
